@@ -1,0 +1,504 @@
+---
+title: "Are Workplaces Really as Equitable as We Say They are?"
+author: "Allison Godfrey, Marcial Nava, Nalini Vineetha, Xiao Chen (Daisy) Ya"
+affiliation: "School of Information, University of California Berkeley"
+date: "August, 2020"
+output: pdf_document
+includes:  
+      in_header: preamble-latex.tex
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE,fig.pos='H')
+```
+
+```{r, echo = FALSE, include=FALSE}
+
+library(kableExtra)
+library(foreign)
+library(data.table)
+library(knitr)
+library(dplyr)
+library(tidyverse)
+library(ggplot2)
+library(lmtest)
+library(sandwich)
+library(stargazer)
+library(pwr)
+require(MASS)
+require(Hmisc)
+require(reshape2)
+
+```
+
+
+## Abstract
+
+*Despite various governmental programs and legislation, gender inequality in the workplace still persists in the US. Recognizing inequality is an important step to bridge the workplace gender gap, but will people’s statements about gender equality change depending on who asks the question? The methodology of experiments offers one approach to measuring the effect of the apparent gender of the person asking questions on the degree to which someone acknowledges gender inequality in their own workplace and in themselves. In this paper, we discuss the implementation of such experiment and present several findings based on the experimental results: (1) there is no apparent evidence that the gender of the voice giving instructions affects the degree to which a person acknowledges the current state of gender inequality in their workplace or in their own actions; (2) male and female participants acknowledge gender inequality to significantly different degrees. In addition, we discuss the limitations and challenges associated with these findings.*
+
+## 1. Introduction
+
+Having a gender-equal working environment valuing all voices positively impacts every person in the workplace, not just women. If we asked a coworker questions about their views of gender equality in the workplace, we would bet they would answer in affirmation. But, do they really want and believe in gender equality or are they just answering the question according to what they think we want to hear? In this experiment, we will be studying the display of individual ideas around gender equality in the workplace and whether the gender of the person on the other end will affect this display. We hypothesize that people who are asked by a woman about their views of gender equality in the workplace will respond more favorably than those who are asked by a man, because when someone is speaking to the group most affected by the inequities (women), they are less likely to want to display their or their company’s biases.
+
+Based on our research, there are no other experiments or observational inference work on this question as of now. One reason for why this limited research could be is that there are many experimental nuances and assumptions to be made in order to make causal conclusions that are able to be generalized to the larger population. We have designed our experiment in a way that mitigates these strong assumptions within the monetary and feasibility constraints. 
+
+## 2 Experiment Design
+
+In this study, male and female pre-recorded voices would be used as proxies for human interaction.  Due to resource and time constraints, we were unable to implement this experiment with live sessions with participants, so we used pre-recorded voices instead. In addition, there could be many other factors influencing the survey results during live sessions, such as facial expression, body languages and speaking tones of the interviewers. Due to these two reasons, results of this study will not be generalized to live interactions since a pre-recorded voice may not be fully representative of a live interaction. 
+
+Subsequently, we created two identical surveys in terms of questions and order, differing only on the gender of the voice asking the questions. The treatment group receives the survey with the instructions read aloud in a female voice and the control group receives the instructions read aloud in a male voice. We had two options when choosing the male and female voices to use: varying the treatment or ensuring the consistency of the male and female voices across all attributes apart from gender. We chose the latter option and selected voices that we determined to be consistent across tone, friendliness, excitement, pitch, articulation, accent, speed, and inflection. We had the two people record their voices after listening to a computer-generated recording of the words they were about to state and were instructed to match the tone as best they could. This was a measure to attempt to neutralize the male and female voices, while also making the recordings more human than an auto-generated voice. 
+
+The study only includes full-time employees in the survey panel since we want to measure participants’ views on gender equality in the workplace environment. Therefore, we need participants who experience a workplace environment the most. We are assuming that limiting our sample to only full-time employees does not bias our results. Although, it is possible that full-time employees are likely to respond differently to a male voice over female voice for reasons other than their experiences in the workplace. However, for the purposes of this experiment, we will be measuring the treatment effect only for full-time employees. 
+
+The surveys are launched through Qualtrics as it enables us to distribute audio surveys to participants who satisfy our requirements. Our sample consists of 120 participants divided equally between men and women. Participants are assigned to treatment and control groups in equal proportion (since we blocked on gender). Several questions are added to the survey in addition to the pre-recorded audio ones. The first two questions in the two surveys relate to quality assurance and screening purposes that help Qualtrics select our participants:
+
+```{r image1, echo=FALSE, fig.cap="Questions for quality assurance and screening purposes", out.width = '100%'}
+knitr::include_graphics("questions_1_2.png")
+```
+
+As stated earlier, participants with the treatment allocation are read the following statements in a female voice while those in the control group are read the statements in a male voice. Then, each participant is asked to rate their level of agreement on the provided 5 point scale. The statements are directed at measuring the level at which a participant acknowledges the current state of gender inequality in their own workplace and the role they may play in it as well. The bolded words will be read by the respective voice and will not be visible to the participant. Instead, the participant will play a recording of the statement in place of the written words.
+
+```{r image2, echo=FALSE, fig.cap="Main survey questions", out.width = '100%'}
+knitr::include_graphics("main_questions.png")
+```
+
+Three additional workplace related statements are added to the surveys so that participants are not aware of what is being studied to decrease potential differential attrition in our study. If certain participants are more likely to attrit after receiving the treatment, our results will become biased. For example, a participant who is ultra-conservative and could be angered by a female talking about gender equality, and thus will exit out of the survey after hearing the female voice but may not have done so had they heard the male voice. In an effort to mitigate this potential differential attrition issue, we attempt to hide the subject of the study by introducing unrelated questions that may make people less likely to attrit due to the treatment. However, we acknowledge that we still may experience some differential attrition in our experimental design. We are also making the assumption that responding to these statements does not affect a participant’s potential outcome i.e. these statements do not influence participant responses on the statements above regarding gender equality. These statements will be read aloud by the same voice as the earlier statements about gender equality. Thus, if it is the voice alone (as opposed to the combination of the voice and the gender equality topic) that angers the ultra-conservative participant, then these questions will not mitigate their higher attrition rate. The questions are as follows: 
+
+```{r image3, echo=FALSE, fig.cap="Questions to prevent attritions", out.width = '100%'}
+knitr::include_graphics("attrition_questions.png")
+```
+
+In addition, we included some additional questions that we will later use in our analysis. Particularly, these are variables that could be correlated with a participant’s potential outcome to treatment. We will use these responses to measure covariate balance in our treatment and control groups and in some heterogeneous treatment effect analyses (discussed later). 
+
+```{r image4, echo=FALSE, fig.cap="Complementary questions", out.width = '100%'}
+knitr::include_graphics("complementary_questions.png")
+```
+
+We are using blocking to have our sample contain 50% women and 50% men. It is important in this study to group subjects with similar potential outcomes. We would suspect that men and women may have systematically different levels of effort they put into the task and may respond to the gendered voices differently. More specifically, people may respond differently to their same gender versus the opposite gender. Using blocking could substantially improve the precision of this study by controlling for the gender of participants within our experimental design. Logistically, we will have a relatively small sample to work with in this experiment (100 participants). Therefore, the blocking advantage is very important for our results if the gender of the participant does in fact help predict our potential outcome. Additionally, we run a heterogeneous regression, studying whether female participants have a different treatment effect than their male counterparts. In this case, it will be important for us to have equal numbers of male and female participants to ensure that our sample size remains large enough to perform this study on heterogeneous effects. 
+
+```{r image5, echo=FALSE, fig.cap="Experiment design flow chart", out.width = '100%'}
+knitr::include_graphics("experiment_design_flowchart.png")
+```
+
+Due to our limited budget, we were only able to purchase a convenience sample of 120 participants. Therefore, due to the lack of randomization in the design, we will not be able to make our results generalize to any other sample or larger population. The following chart shows the mapping of our survey results. Our results will be specific to the sample included in our experiment since we cannot claim to have representative data about the larger population. While we are not making any claims about inference to a larger population, this study can still provide high quality learning about our sample average treatment effect. 
+
+Our outcome variables are the participants’ rankings (1-5) on each of the 4 questions and their sum of rankings. Since our outcome variable is ordered, we considered both OLS and ordinal logistic regression for our modeling choices. After much discussion, we ultimately chose to use OLS regression, making the strong assumption that the differences between each scale point are equal. While the ordinal logistic regression would not force us to make this assumption, the results from this model are very difficult to interpret and draw conclusions from. Given our background in interpreting OLS regression results over ordinal logistic regressions, we chose to interpret our results using OLS regression while we also acknowledge that it is very likely that our assumption of equal differences does not actually hold in reality. 
+
+## 3 Results and Analysis
+
+### 3.1 Exploratory Data Analysis
+
+Before we begin our analysis, it is important to check for covariate balance among our treatment and control groups. We can see in the first bar chart that the distribution of male and female participants is exactly equal in our treatment and control groups, which is expected since we blocked on this variable. In the second chart referencing Age Group, we see that in both the treatment and control groups, there is roughly the same skew towards participants 30-45 years old. Our treatment group (female voice) has a few participants over 60 years old while our control group does not. This represents some slight imbalance in the two groups on this covariate, but we will be assuming balance for the purposes of our regression analysis. The third chart on Race shows generally balanced treatment and control groups on race, while the fourth chart on Industry shows some slight imbalance in industry between treatment and control groups. Our treatment group (female voice) has many more people in “other” while our control group (male voice) contains more people in the technology industry. Again, we will be assuming balance across this covariate for the purposes of our study. 
+
+```{r image6, echo=FALSE, fig.cap="Covariate balance", out.width = '100%'}
+knitr::include_graphics("covariate_balance.png")
+```
+
+```{r image7, echo=FALSE, fig.cap="Differences in ratings", out.width = '100%'}
+knitr::include_graphics("box_plots.png")
+```
+
+```{r Preparing datasets, echo=FALSE}
+
+#Read curated survery responses 
+survey.female.raw <- fread("Survey_1.csv")
+survey.male.raw <- fread("Survey_2.csv")
+
+#Female Survey
+survey.female.raw$FemaleVoice <- 1
+survey.female.raw$Voice <- 'Female'
+
+#Male Survey
+survey.male.raw$FemaleVoice <- 0
+survey.male.raw$Voice <- 'Male'
+
+#merge surveys 
+survey.combined.raw <- rbind(survey.female.raw,survey.male.raw)
+
+#remove columns 
+survey.combined.raw[, c("RecipientFirstName","RecipientEmail","RecipientLastName","LocationLatitude","ExternalReference","LocationLongitude","DistributionChannel","Q_RecaptchaScore","Q_BallotBoxStuffing","StartDate","EndDate","Status","IPAddress","Progress","Duration (in seconds)","Q21_First Click","Q21_Last Click","Q21_Page Submit","Q21_Click Count","opp","RISN","V","QPMID","Q_RelevantIDFraudScore",	"Q_RelevantIDDuplicate","Q_RelevantIDDuplicateScore","gc","term","LS","rid"):=NULL] 
+
+#rename  columns 
+survey.processed <- survey.combined.raw %>%
+  rename(
+    ProvideBestAnswers = Q24,
+    EmploymentStatus = Q25,
+    FlexibleWorkFromHomeCulture = Q7_1,
+    GenderEqualityWorkPlace = Q7_2,
+    WorkHoursMoreThan40 = Q7_3,
+    GenderEqualPay = Q7_4,
+    SeniorLeadershipAlignment = Q7_5,
+    SelfGenderEqualTreatment = Q7_6,
+    GenderEqualNumberSeniorPositions = Q7_7,
+    Industry = Q13,
+    Position = Q15,
+    EmployeeCount = Q17,
+    Gender = Q19,
+    Race = Q21,
+    AgeGroup = Q23,
+    USResident = Q25_1,
+    TotalDuration = Q_TotalDuration
+    )
+
+#remove null surveys
+survey.processed <- na.omit(survey.processed, cols = c("FlexibleWorkFromHomeCulture", "GenderEqualityWorkPlace"))
+
+#Convert string responses to integer
+survey.processed$FlexibleWorkFromHomeCulture <- strtoi(substr(survey.processed$FlexibleWorkFromHomeCulture,1,1))
+survey.processed$GenderEqualityWorkPlace <- strtoi(substr(survey.processed$GenderEqualityWorkPlace,1,1))
+survey.processed$WorkHoursMoreThan40 <- strtoi(substr(survey.processed$WorkHoursMoreThan40,1,1))
+survey.processed$GenderEqualPay <- strtoi(substr(survey.processed$GenderEqualPay,1,1))
+survey.processed$SeniorLeadershipAlignment <- strtoi(substr(survey.processed$SeniorLeadershipAlignment,1,1))
+survey.processed$SelfGenderEqualTreatment <- strtoi(substr(survey.processed$SelfGenderEqualTreatment,1,1))
+survey.processed$GenderEqualNumberSeniorPositions <- strtoi(substr(survey.processed$GenderEqualNumberSeniorPositions,1,1))
+
+#Combine gender responses into one
+survey.processed$SumResponse<- survey.processed$GenderEqualityWorkPlace +
+                               survey.processed$GenderEqualPay +
+                               survey.processed$SelfGenderEqualTreatment +
+                               survey.processed$GenderEqualNumberSeniorPositions
+
+#Combine responses into average
+survey.processed$AvgResponse<- (survey.processed$GenderEqualityWorkPlace +
+                               survey.processed$GenderEqualPay +
+                               survey.processed$SelfGenderEqualTreatment +
+                               survey.processed$GenderEqualNumberSeniorPositions)/4
+
+#Turning variables into factors
+survey.processed$EmploymentStatus <- factor(survey.processed$EmploymentStatus)
+survey.processed$Industry <- factor(survey.processed$Industry)
+survey.processed$Position <- factor(survey.processed$Position)
+survey.processed$EmployeeCount <- factor(survey.processed$EmployeeCount, ordered = TRUE)
+survey.processed$Gender <- factor(survey.processed$Gender)
+survey.processed$Race <- factor(survey.processed$Race)
+survey.processed$AgeGroup <- factor(survey.processed$AgeGroup, ordered = TRUE)
+survey.processed$USResident <- factor(survey.processed$USResident)
+survey.processed$FemaleVoice <- factor(survey.processed$FemaleVoice)
+survey.processed$Voice <- factor(survey.processed$Voice)
+
+####For Ordered Logit####
+
+#Survey processed for orderded logit
+survey.logit <- survey.combined.raw %>%
+  rename(
+    ProvideBestAnswers = Q24,
+    EmploymentStatus = Q25,
+    FlexibleWorkFromHomeCulture = Q7_1,
+    GenderEqualityWorkPlace = Q7_2,
+    WorkHoursMoreThan40 = Q7_3,
+    GenderEqualPay = Q7_4,
+    SeniorLeadershipAlignment = Q7_5,
+    SelfGenderEqualTreatment = Q7_6,
+    GenderEqualNumberSeniorPositions = Q7_7,
+    Industry = Q13,
+    Position = Q15,
+    EmployeeCount = Q17,
+    Gender = Q19,
+    Race = Q21,
+    AgeGroup = Q23,
+    USResident = Q25_1,
+    TotalDuration = Q_TotalDuration
+    )
+
+survey.logit <- na.omit(survey.logit, cols = c("FlexibleWorkFromHomeCulture", "GenderEqualityWorkPlace"))
+
+survey.logit$EmploymentStatus <- factor(survey.logit$EmploymentStatus)
+survey.logit$Industry <- factor(survey.logit$Industry)
+survey.logit$Position <- factor(survey.logit$Position)
+survey.logit$EmployeeCount <- factor(survey.logit$EmployeeCount, ordered = TRUE)
+survey.logit$Gender <- factor(survey.logit$Gender)
+survey.logit$Race <- factor(survey.logit$Race)
+survey.logit$AgeGroup <- factor(survey.logit$AgeGroup, ordered = TRUE)
+survey.logit$USResident <- factor(survey.logit$USResident)
+survey.logit$FemaleVoice <- factor(survey.logit$FemaleVoice)
+survey.logit$Voice <- factor(survey.logit$Voice)
+```
+
+The box plots in Figure 7 examine the differences in ratings in treatment and control groups within each question on gender equality in the workplace. As mentioned previously, we hypothesize people who listen to the female voice will rate their perceived level of gender equality as higher than those who listen to the male voice. We see preliminary evidence of this hypothesis in the first question on whether women and men are treated equally in the workplace. However, this trend does not persist throughout the other questions, and in some cases, the opposite is observed. Perhaps the ambiguity behind this statement contributes to the differences in responses. While the other questions are more specific and straightforward (e.g. "there are equal numbers of men and women in senior level positions in my workplace"), there may be less room for differences in interpretation. In order to statistically test our hypothesis, we will perform regression analyses to determine statistical and practical significance.
+```{r EDA_boxplots, echo=FALSE, include=FALSE}
+
+# plots same as 'Voice' 
+par(mfrow=c(2,3))
+ggplot(survey.processed, aes(x=FemaleVoice, y=GenderEqualityWorkPlace, fill=FemaleVoice)) + geom_boxplot() + ggtitle("Women and men are treated equally in my work place") +   theme(plot.title = element_text(size = 10, hjust = 0.5))
+ggplot(survey.processed, aes(x=FemaleVoice, y=GenderEqualPay, fill=FemaleVoice)) + geom_boxplot() + ggtitle("Men and women are currently being paid the same in my work place") +   theme(plot.title = element_text(size = 10, hjust = 0.5))
+ggplot(survey.processed, aes(x=FemaleVoice, y=SelfGenderEqualTreatment, fill=FemaleVoice)) + geom_boxplot() + ggtitle("I always treat men and women equally at my work place") +   theme(plot.title = element_text(size = 10, hjust = 0.5))
+ggplot(survey.processed, aes(x=FemaleVoice, y=GenderEqualNumberSeniorPositions, fill=FemaleVoice)) + geom_boxplot() + ggtitle("Roughly equal number of men and women at senior level positions in my work place") +   theme(plot.title = element_text(size = 10, hjust = 0.5))
+ggplot(survey.processed, aes(x=FemaleVoice, y=SumResponse, fill=FemaleVoice)) + geom_boxplot() + ggtitle("Sum Of Responses") +   theme(plot.title = element_text(size = 10, hjust = 0.5))
+```
+
+
+```{r boxplots - Gender, echo = FALSE, include=FALSE}
+par(mfrow=c(2,3))
+
+ggplot(survey.processed, aes(x=Gender, y=GenderEqualityWorkPlace, fill=Gender)) + geom_boxplot() + ggtitle("Women and men are treated equally in my work place") +   theme(plot.title = element_text(size = 10, hjust = 0.5)) + scale_fill_hue(c=45,l=80)
+ggplot(survey.processed, aes(x=Gender, y=GenderEqualPay, fill=Gender)) + geom_boxplot() + ggtitle("Men and women are currently being paid the same in my work place") +   theme(plot.title = element_text(size = 10, hjust = 0.5)) + scale_fill_hue(c=45,l=80)
+ggplot(survey.processed, aes(x=Gender, y=SelfGenderEqualTreatment, fill=Gender)) + geom_boxplot() + ggtitle("I always treat men and women equally at my work place") +   theme(plot.title = element_text(size = 10, hjust = 0.5)) + scale_fill_hue(c=45,l=80)
+ggplot(survey.processed, aes(x=Gender, y=GenderEqualNumberSeniorPositions, fill=Gender)) + geom_boxplot() + ggtitle("Roughly equal number of men and women at senior level positions in my work place") +   theme(plot.title = element_text(size = 10, hjust = 0.5)) + scale_fill_hue(c=45,l=80)
+ggplot(survey.processed, aes(x=Gender, y=SumResponse, fill=Gender)) + geom_boxplot() + ggtitle("Sum Of Responses") +   theme(plot.title = element_text(size = 10, hjust = 0.5)) + scale_fill_hue(c=45,l=80)
+```
+
+It is also important to note that we could not measure the level of differential attrition that may be present in our study. Qualtrics only gives us responses that have been fully completed and excludes those that were partially completed. Without knowing which respondants completed the survey versus which respondents attritted, we cannot make any claims as to whether the attrition was caused by the treatment or not. Therefore, we cannot tell from the data whether the natural attrition in our survey study was random or caused by the treatment. If we were to do this experiment again, we would request the partially completed surveys from Qualtrics as well. 
+
+### 3.2 Regression Analysis
+
+```{r Main Regression Table, echo = FALSE, include = FALSE}
+
+model.1 <- lm(AvgResponse ~ FemaleVoice, data = survey.processed)
+robust_se.1 <- (sqrt(diag(vcovHC(model.1 ))))
+
+model.2 <- lm(AvgResponse ~ FemaleVoice + Gender, data = survey.processed)
+robust_se.2 <- (sqrt(diag(vcovHC(model.2 ))))
+
+model.3 <- lm(AvgResponse ~ FemaleVoice + Gender + FemaleVoice*Gender, data = survey.processed)
+robust_se.3 <- (sqrt(diag(vcovHC(model.3))))
+
+model.4 <- lm(AvgResponse ~ FemaleVoice + Gender + FemaleVoice*Gender + AgeGroup, data = survey.processed)
+robust_se.4 <- (sqrt(diag(vcovHC(model.4))))
+
+model.5 <- lm(AvgResponse ~ FemaleVoice + Gender + FemaleVoice*Gender + AgeGroup + EmployeeCount, data = survey.processed)
+robust_se.5 <- (sqrt(diag(vcovHC(model.5))))
+
+model.6 <- lm(AvgResponse ~ FemaleVoice + Gender + FemaleVoice*Gender + AgeGroup + EmployeeCount + Position, data = survey.processed)
+robust_se.6 <- (sqrt(diag(vcovHC(model.6))))
+
+model.7 <- lm(AvgResponse ~ FemaleVoice + Gender + FemaleVoice*Gender + AgeGroup + EmployeeCount + Position + Industry, data = survey.processed)
+robust_se.7 <- (sqrt(diag(vcovHC(model.7))))
+
+#format and print
+stargazer(model.1, model.2, model.3, model.4, model.5, model.6,model.7, type = "text",
+          title = "Table 1. OLS Specifications for Participant's Average Response ",
+          align = TRUE,
+          se = list(robust_se.1, robust_se.2, robust_se.3, robust_se.4, robust_se.5, robust_se.6, robust_se.7),
+          omit.table.layout = "n",
+          omit = c("AgeGroup", "EmployeeCount","EmploymentStatus","Industry"),
+          omit.labels = c("Age Factors", "Employee Count Factors", "Position Factors", "Industry Factors"),
+          omit.yes.no = c("Yes", "No"))
+```
+
+Figure 8 shows a series of regressions that measure the impact of the female voice giving instructions on the average rating of the participant within the 4 questions on gender equality. The higher the response, the higher the level of gender equality the participant claims exists in their workplace. In every model, we do not see a statistically significant average treatment effect, illustrating that the voice of the instructions does not impact the level of which people rate their views of gender equality in themselves and their workplace. 
+
+```{r image8, echo=FALSE, fig.cap="OLS Specifications for Average Score", out.width = '100%'}
+knitr::include_graphics("main_regression_avg_score.png")
+```
+
+In model 1, which includes no covariates, the difference in average survey responses between our two groups was insignificantly different from 0. Model 2 shows that when including the male covariate for the gender of the participant, we see that male participants claim that their workplace is more gender equal than their female counterparts. Males rank the level of gender equality in the workplace as about ½ a point higher on average than female participants do, which is an interesting finding, but does not make any conclusion about our treatment effect. 
+
+Once the covariate of participant position is included in model 6, the coefficient on the participant's gender becomes statistically insignificant. Part of the effect in the gender coefficient could be coming from its correlation with the participant’s role in a company. For example, if more males are in engineering and people in engineering are more likely to rank gender equality levels higher, then we will see the effect of the role within the coefficient of the gender if we do not control for position in the regression. 
+
+```{r Summary of OLS regressions Gender Equal Number of Senior Positions, echo = FALSE, include = FALSE}
+
+#Outcome against FemaleVoice
+
+model.1 <- lm(GenderEqualNumberSeniorPositions ~ FemaleVoice, data = survey.processed)
+robust_se.1 <- (sqrt(diag(vcovHC(model.1 ))))
+
+model.2 <- lm(GenderEqualNumberSeniorPositions ~ FemaleVoice + Gender, data = survey.processed)
+robust_se.2 <- (sqrt(diag(vcovHC(model.2 ))))
+
+model.3 <- lm(GenderEqualNumberSeniorPositions ~ FemaleVoice + Gender + FemaleVoice*Gender, data = survey.processed)
+robust_se.3 <- (sqrt(diag(vcovHC(model.3))))
+
+model.4 <- lm(GenderEqualNumberSeniorPositions ~ FemaleVoice + Gender + FemaleVoice*Gender + AgeGroup, data = survey.processed)
+robust_se.4 <- (sqrt(diag(vcovHC(model.4))))
+
+model.5 <- lm(GenderEqualNumberSeniorPositions ~ FemaleVoice + Gender + FemaleVoice*Gender + AgeGroup + EmployeeCount, data = survey.processed)
+robust_se.5 <- (sqrt(diag(vcovHC(model.5))))
+
+model.6 <- lm(GenderEqualNumberSeniorPositions ~ FemaleVoice + Gender + FemaleVoice*Gender + AgeGroup + EmployeeCount + Position, data = survey.processed)
+robust_se.6 <- (sqrt(diag(vcovHC(model.6))))
+
+model.7 <- lm(GenderEqualNumberSeniorPositions ~ FemaleVoice + Gender + FemaleVoice*Gender + AgeGroup + EmployeeCount + Position + Industry, data = survey.processed)
+robust_se.7 <- (sqrt(diag(vcovHC(model.7))))
+
+#format and print
+stargazer(model.1, model.2, model.3, model.4, model.5, model.6,model.7, type = "text",
+          title = "Table 2. OLS Models for Gender Equal Number of Senior Positions",
+          align = TRUE,
+          se = list(robust_se.1, robust_se.2, robust_se.3, robust_se.4, robust_se.5, robust_se.6, robust_se.7),
+          omit.table.layout = "n",
+          omit = c("AgeGroup", "EmployeeCount","Position","Industry"),
+          omit.labels = c("Age Factors", "Employee Count Factors", "Position Factors", "Industry Factors"),
+          omit.yes.no = c("Yes", "No"))
+
+```
+
+```{r image9, echo=FALSE, fig.cap="OLS Specifications for Gender Equality in Senior Positions", out.width = '100%'}
+knitr::include_graphics("ols_senior_positions.png")
+```
+
+In Figure 9, the outcome measure changes from the average response to the specific response on the question pertaining to whether there are roughly equal numbers of males and females at senior level positions in your company. In model 3, which includes the treatment variable, the gender, and the interaction term between the two, coefficient on the interaction term is statistically significant, illustrating that there is a lower treatment effect for our male participants than for our female participants. In other words, listening to a female voice causes male participants to raise their ranking of gender equality levels by less than if they were a female participant. This is a surprising result as we would expect male participants to be less rigid in their views of gender equality in the workplace as part of the group least affected.
+
+However, once controlling for the 4 covariates in the regression, the coefficient on this interaction term loses its significance. As we add more covariates, the standard errors increase, which is unexpected. This increase may be due to the small cell size or the fact that we are subtracting many degrees of freedom by adding the covariates to the regression. To be able to maintain statistical significance on this coefficient, we would need to increase the statistical power of our study by increasing the sample size. Using the following [Statistical Power Tool](https://clincalc.com/stats/samplesize.aspx), we were able to calculate the sample size that would be needed for each of the regression models to achieve 80% power. Based on the regression results including each group's mean and standard deviation, we would need a sample size of 704,844 participants in each group (treatment and control) to achieve 80% statistical power with the average response as the outcome variable. Given our current sample size, means, and standard deviations, we have only achieved 3% power. Since our two means are very similar, it would make intuitive sense that this sample size would need to be very large to achieve statistical significance on the coefficient of the treatment effect. If our outcome variable is instead each individual survey response on gender equality, we would need sample sizes of 584, 20577, 863, and 3037 in each group respectively. The sample sizes necessary for 80% statistical power are much smaller for the individual response outcomes than the average response as the outcome since there are higher differences detected between the treatment and control groups in each individual question. 
+
+It is important to note that we do not run into the multiple comparisons problem since we did not find a statistically significant treatment effect. However, if we were to find a significant result in one of our many regressions each run with 5 different outcome variables, we would need to adjust our p-value threshold accordingly to account for the multiple comparisons problem. 
+
+## Conclusion
+
+While we did not get a statistically significant treatment effect of changing the voice giving instructions on the display of gender equality in the workplace, these results may be more due to the experimental design than the fact that the expected effect does not actually exist. We can conclude from our study that having a pre-recorded male and female voice giving the instructions for the survey simply is not enough to change the way people respond to questions around gender equality. However, the study results cannot be generalized to the possible effect of having live and/or in-person interactions with a male and female instructor while displaying one’s views of gender equality. We suspect that an experiment with live interactions between the participant and instructor will unveil the possible gendered treatment effect more effectively than a pre-recorded voice would. Therefore, there are many possible extensions of this study (which may require a higher budget) in order to make generalized and accurate conclusions about the effect of the apparent gender of the instructor on how people display their views of gender equality in the workplace. 
+
+## 5 References
+
+Alan S. Gerber and Donald P. Green (2012). "Field Experiments. Design Analysis and Interpretation." Norton. 1st. Edition.
+
+Joshua D. Angrist and Jorn-Steffen Pischke (2015). "Master Metrics. The Path From Cause to Effect."" Princeton University Press. 1st Edition.
+
+## 6. Appendix
+
+```{r Gender Equality in the Workplace, echo = FALSE, include = FALSE}
+#Outcome against FemaleVoice
+
+model.1 <- lm(GenderEqualityWorkPlace ~ FemaleVoice, data = survey.processed)
+robust_se.1 <- (sqrt(diag(vcovHC(model.1 ))))
+
+model.2 <- lm(GenderEqualityWorkPlace ~ FemaleVoice + Gender, data = survey.processed)
+robust_se.2 <- (sqrt(diag(vcovHC(model.2 ))))
+
+model.3 <- lm(GenderEqualityWorkPlace ~ FemaleVoice + Gender + FemaleVoice*Gender, data = survey.processed)
+robust_se.3 <- (sqrt(diag(vcovHC(model.3))))
+
+model.4 <- lm(GenderEqualityWorkPlace ~ FemaleVoice + Gender + FemaleVoice*Gender + AgeGroup, data = survey.processed)
+robust_se.4 <- (sqrt(diag(vcovHC(model.4))))
+
+model.5 <- lm(GenderEqualityWorkPlace ~ FemaleVoice + Gender + FemaleVoice*Gender + AgeGroup + EmployeeCount, data = survey.processed)
+robust_se.5 <- (sqrt(diag(vcovHC(model.5))))
+
+model.6 <- lm(GenderEqualityWorkPlace ~ FemaleVoice + Gender + FemaleVoice*Gender + AgeGroup + EmployeeCount + Position, data = survey.processed)
+robust_se.6 <- (sqrt(diag(vcovHC(model.6))))
+
+model.7 <- lm(GenderEqualityWorkPlace ~ FemaleVoice + Gender + FemaleVoice*Gender + AgeGroup + EmployeeCount + Position + Industry, data = survey.processed)
+robust_se.7 <- (sqrt(diag(vcovHC(model.7))))
+
+#format and print
+stargazer(model.1, model.2, model.3, model.4, model.5, model.6,model.7, type = "text",
+          title = "Table 3. OLS Models for Gender Equality in the Work Place ",
+          align = TRUE,
+          se = list(robust_se.1, robust_se.2, robust_se.3, robust_se.4, robust_se.5, robust_se.6, robust_se.7),
+          omit.table.layout = "n",
+          omit = c("AgeGroup", "EmployeeCount","Position","Industry"),
+          omit.labels = c("Age Factors", "Employee Count Factors", "Position Factors", "Industry Factors"),
+          omit.yes.no = c("Yes", "No"))
+
+
+```
+
+```{r image10, echo=FALSE, fig.cap="OLS Specifications for Gender Equality in the Workplace", out.width = '100%'}
+knitr::include_graphics("ols_gender_equality.png")
+```
+
+```{r Self Gender Equal Treatment,  echo = FALSE, include = FALSE}
+
+#Outcome against FemaleVoice
+
+model.1 <- lm(SelfGenderEqualTreatment ~ FemaleVoice, data = survey.processed)
+robust_se.1 <- (sqrt(diag(vcovHC(model.1 ))))
+
+model.2 <- lm(SelfGenderEqualTreatment ~ FemaleVoice + Gender, data = survey.processed)
+robust_se.2 <- (sqrt(diag(vcovHC(model.2 ))))
+
+model.3 <- lm(SelfGenderEqualTreatment ~ FemaleVoice + Gender + FemaleVoice*Gender, data = survey.processed)
+robust_se.3 <- (sqrt(diag(vcovHC(model.3))))
+
+model.4 <- lm(SelfGenderEqualTreatment ~ FemaleVoice + Gender + FemaleVoice*Gender + AgeGroup, data = survey.processed)
+robust_se.4 <- (sqrt(diag(vcovHC(model.4))))
+
+model.5 <- lm(SelfGenderEqualTreatment ~ FemaleVoice + Gender + FemaleVoice*Gender + AgeGroup + EmployeeCount, data = survey.processed)
+robust_se.5 <- (sqrt(diag(vcovHC(model.5))))
+
+model.6 <- lm(SelfGenderEqualTreatment ~ FemaleVoice + Gender + FemaleVoice*Gender + AgeGroup + EmployeeCount + Position, data = survey.processed)
+robust_se.6 <- (sqrt(diag(vcovHC(model.6))))
+
+model.7 <- lm(SelfGenderEqualTreatment ~ FemaleVoice + Gender + FemaleVoice*Gender + AgeGroup + EmployeeCount + Position + Industry, data = survey.processed)
+robust_se.7 <- (sqrt(diag(vcovHC(model.7))))
+
+#format and print
+stargazer(model.1, model.2, model.3, model.4, model.5, model.6,model.7, type = "text",
+          title = "Table 4. OLS Models for Gender Equal Treatment ",
+          align = TRUE,
+          se = list(robust_se.1, robust_se.2, robust_se.3, robust_se.4, robust_se.5, robust_se.6, robust_se.7),
+          omit.table.layout = "n",
+          omit = c("AgeGroup", "EmployeeCount","Position","Industry"),
+          omit.labels = c("Age Factors", "Employee Count Factors", "Position Factors", "Industry Factors"),
+          omit.yes.no = c("Yes", "No"))
+
+```
+
+```{r image11, echo=FALSE, fig.cap="OLS Specifications for Self Gender Equal Treatment", out.width = '100%'}
+knitr::include_graphics("ols_self_gender_equal_treatment.png")
+```
+
+```{r OLS Specifications for Perception on Gender Equal Pay,  echo = FALSE, include = FALSE}
+
+#Outcome against FemaleVoice
+
+model.1 <- lm(GenderEqualPay ~ FemaleVoice, data = survey.processed)
+robust_se.1 <- (sqrt(diag(vcovHC(model.1 ))))
+
+model.2 <- lm(GenderEqualPay ~ FemaleVoice + Gender, data = survey.processed)
+robust_se.2 <- (sqrt(diag(vcovHC(model.2 ))))
+
+model.3 <- lm(GenderEqualPay ~ FemaleVoice + Gender + FemaleVoice*Gender, data = survey.processed)
+robust_se.3 <- (sqrt(diag(vcovHC(model.3))))
+
+model.4 <- lm(GenderEqualPay ~ FemaleVoice + Gender + FemaleVoice*Gender + AgeGroup, data = survey.processed)
+robust_se.4 <- (sqrt(diag(vcovHC(model.4))))
+
+model.5 <- lm(GenderEqualPay ~ FemaleVoice + Gender + FemaleVoice*Gender + AgeGroup + EmployeeCount, data = survey.processed)
+robust_se.5 <- (sqrt(diag(vcovHC(model.5))))
+
+model.6 <- lm(GenderEqualPay ~ FemaleVoice + Gender + FemaleVoice*Gender + AgeGroup + EmployeeCount + Position, data = survey.processed)
+robust_se.6 <- (sqrt(diag(vcovHC(model.6))))
+
+model.7 <- lm(GenderEqualPay ~ FemaleVoice + Gender + FemaleVoice*Gender + AgeGroup + EmployeeCount + Position + Industry, data = survey.processed)
+robust_se.7 <- (sqrt(diag(vcovHC(model.7))))
+
+#format and print
+stargazer(model.1, model.2, model.3, model.4, model.5, model.6,model.7, type = "text",
+          title = "Table 5. OLS Models for Gender Equal Pay ",
+          align = TRUE,
+          se = list(robust_se.1, robust_se.2, robust_se.3, robust_se.4, robust_se.5, robust_se.6, robust_se.7),
+          omit.table.layout = "n",
+          omit = c("AgeGroup", "EmployeeCount","Position","Industry"),
+          omit.labels = c("Age Factors", "Employee Count Factors", "Position Factors", "Industry Factors"),
+          omit.yes.no = c("Yes", "No"))
+
+```
+
+```{r image12, echo=FALSE, fig.cap="OLS Specifications for Self Gender Equal Pay", out.width = '100%'}
+knitr::include_graphics("ols_gender_equal_pay.png")
+```
+
+```{r Ordered Logistic Regression, echo = FALSE, include = FALSE}
+
+#GenderEqualityWorkPlace
+logit_equality <- factor(survey.processed[,GenderEqualityWorkPlace])
+model.1 <- polr(logit_equality ~ FemaleVoice + Gender + FemaleVoice*Gender, data = survey.logit)
+#coef(summary(model.1))
+
+#GenderEqualPay
+logit_EqualPay <- factor(survey.processed[,GenderEqualPay])
+model.2 <- polr(logit_EqualPay ~ FemaleVoice + Gender + FemaleVoice*Gender, data = survey.logit)
+#coef(summary(model.2))
+
+#SelfGenderEqualTreatment
+logit_EqualTreatment <- factor(survey.processed[,SelfGenderEqualTreatment])
+model.3 <- polr(logit_EqualTreatment ~ FemaleVoice + Gender + FemaleVoice*Gender, data = survey.logit)
+#coef(summary(model.3))
+
+#GenderEqualNumberSeniorPositions
+logit_EqualSeniorPositions <- factor(survey.processed[, GenderEqualNumberSeniorPositions])
+model.4 <- polr(logit_EqualSeniorPositions ~ FemaleVoice + Gender + FemaleVoice*Gender, data = survey.logit)
+#coef(summary(model.4))
+
+#format and print
+stargazer( model.1, model.2, model.3, model.4, type = "text",
+          title = "Table 6. Ordered Logit Regressions")
+          # se = list(robust_se.1, robust_se.2, robust_se.3, robust_se.4, robust_se.5),
+          # omit.table.layout = "n")
+
+# robust_se.1 <- (sqrt(diag(vcovHC(model.1 ))))
+
+```
+
+```{r image13, echo=FALSE, fig.cap="Ordered Logit Regression", out.width = '100%'}
+knitr::include_graphics("ordered_logit_regression.png")
+```
