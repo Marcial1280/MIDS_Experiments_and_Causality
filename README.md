@@ -1,10 +1,10 @@
-# MIDS_Experiments_and_Causality
+# MIDS 241: Experiments and Causality
 
-# Are Workplaces Really as Equitable as We Say They are?
+## Are Workplaces Really as Equitable as We Say They are?
 by Allison Godfrey, Marcial Nava, Nalini Vineetha, Xiao Chen (Daisy) Ya
 August, 2020
 
-## Abstract
+### Abstract
 Despite various governmental programs and legislation, gender inequality in the workplace still persists in
 the US. Recognizing inequality is an important step to bridge the workplace gender gap, but will people’s
 statements about gender equality change depending on who asks the question? The methodology of experiments
